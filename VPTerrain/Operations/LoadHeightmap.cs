@@ -98,7 +98,7 @@ namespace VPTerrain
                         var pixelZ = cellZ + nodeOffsetZ + tileOffsetZ;
                         var pixel  = heightmap.GetPixel(pixelX, pixelZ);
                         var height = (float) pixel.R;
-                        var ratio  = pixel.B;
+                        var ratio  = Math.Max( (int) pixel.B, 1 );
                         var cell   = new TerrainCell
                         {
                             Height = (height - Consts.HeightmapGroundLevel) / ratio,
@@ -106,7 +106,7 @@ namespace VPTerrain
                         };
 
                         // TODO: Investigate why swapping z and x is nessecary...
-                        node[cellZ,cellX] = cell;
+                        node[cellX, cellZ] = cell;
                     }
 
                     Console.Title = "Writing node {0}x{1} for tile {2}x{3}".LFormat(nodeX, nodeZ, tileX, tileZ);

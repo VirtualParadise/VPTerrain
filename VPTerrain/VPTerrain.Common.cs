@@ -23,7 +23,6 @@ namespace VPTerrain
         public const int NodePerTile = 4;
         public const int CellPerTile = CellPerNode * NodePerTile; // 32
 
-        public const int HeightmapRatio = 50; // 50, 20
         public const int HeightmapGroundLevel = 32;
     }
 }
