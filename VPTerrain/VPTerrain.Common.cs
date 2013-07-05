@@ -9,6 +9,8 @@ namespace VPTerrain
     {
         SaveHeightmap,
         LoadHeightmap,
+        TreeGen,
+        TreeGenUndo,
         Exit
     }
 

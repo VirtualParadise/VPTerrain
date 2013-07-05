@@ -32,6 +32,7 @@ namespace VPTerrain
             {
                 var task = ConsoleEx.AskEnum<Operations>("What would you like to do?");
 
+                // TODO: change this to reflection based system
                 switch (task)
                 {
                     case Operations.Exit:
@@ -44,6 +45,14 @@ namespace VPTerrain
 
                     case Operations.LoadHeightmap:
                         DoOperation( new LoadHeightmap() );
+                        break;
+
+                    case Operations.TreeGen:
+                        DoOperation( new TreeGen() );
+                        break;
+
+                    case Operations.TreeGenUndo:
+                        DoOperation( new TreeGenUndo() );
                         break;
                 }
 

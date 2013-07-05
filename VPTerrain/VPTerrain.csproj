@@ -63,6 +63,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Operations\TreeGenUndo.cs" />
+    <Compile Include="Operations\TreeGen.cs" />
     <Compile Include="Operations\LoadHeightmap.cs" />
     <Compile Include="Operations\IOperation.cs" />
     <Compile Include="Operations\SaveHeightmap.cs" />

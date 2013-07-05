@@ -26,6 +26,21 @@ namespace VPTerrain
                 return value;
         }
 
+        public static float AskFloat(string query)
+        {
+            TConsole.WriteLineColored(ConsoleColor.Cyan, "\n*** {0}", query);
+            Console.Write("(floats only) > ");
+            var value = 0f;
+
+            if ( !float.TryParse(Console.ReadLine().Trim(), out value) )
+            {
+                TConsole.WriteLineColored(ConsoleColor.Red, "!!! That is not a valid float");
+                return AskFloat(query);
+            }
+            else
+                return value;
+        }
+
         public static bool AskBool(string query)
         {
             TConsole.WriteLineColored(ConsoleColor.Cyan, "\n*** {0}", query);
