@@ -39,7 +39,7 @@ namespace VPTerrain
             imageZ     = widthZ * Consts.CellPerTile;
 
             Console.WriteLine("### Will scan a total of {0} tiles and {1} nodes, saving an image of {2}x{3}", totalTiles, totalNodes, imageX, imageZ);
-            Console.WriteLine("### Image will be saved in the {0} directory", bot.CurrentWorld);
+            Console.WriteLine("### Image will be saved in the {0} directory", bot.World);
 
             if ( !ConsoleEx.AskBool("Is this correct?") )
                 Run(bot);
@@ -47,8 +47,8 @@ namespace VPTerrain
             {
                 this.bot = bot;
 
-                if ( !Directory.Exists(bot.CurrentWorld) )
-                    Directory.CreateDirectory(bot.CurrentWorld);
+                if ( !Directory.Exists(bot.World) )
+                    Directory.CreateDirectory(bot.World);
 
                 CommenceScan();
                 SaveResult();
@@ -77,7 +77,7 @@ namespace VPTerrain
             }
 
             while (scanning)
-                bot.Wait(100);
+                bot.Pump();
         }
 
         public void SaveResult()
@@ -86,7 +86,7 @@ namespace VPTerrain
                 originTileX, originTileZ,
                 originTileX + widthX - 1,
                 originTileZ + widthZ - 1);
-            var path = "{0}/{1}".LFormat(bot.CurrentWorld, file);
+            var path = "{0}/{1}".LFormat(bot.World, file);
 
             Log.Info(tag, "Saving to {0}", path);
             heightmap.Save(path);
@@ -106,12 +106,12 @@ namespace VPTerrain
                 var pixelX = x + nodeOffsetX + tileOffsetX;
                 var pixelZ = z + nodeOffsetZ + tileOffsetZ;
 
-                var cell   = node[x, z];
-                var hole   = cell.Hole ? 0xFF : 0;
-                var height = (int) (Consts.HeightmapGroundLevel + cell.Height * ratio);
-                height     = height.Clamp(0, 255);
+                var cell    = node[x, z];
+                var texture = cell.Hole ? 0xFF : Math.Min(cell.Texture, (ushort) 254);
+                var height  = (int) (Consts.HeightmapGroundLevel + cell.Height * ratio);
+                    height  = height.Clamp(0, 255);
 
-                heightmap.SetPixel(pixelX, pixelZ, System.Drawing.Color.FromArgb(height, hole, ratio) );
+                heightmap.SetPixel(pixelX, pixelZ, System.Drawing.Color.FromArgb(height, texture, ratio) );
             }
 
             scanned++;

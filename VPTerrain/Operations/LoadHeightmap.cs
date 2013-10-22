@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
 using System.Drawing;
+using System.IO;
 using System.Text.RegularExpressions;
 using VP;
 
@@ -23,6 +21,7 @@ namespace VPTerrain
         int totalNodes;
         int totalTiles;
 
+        int      sent;
         bool     sending;
         string   path;
         Instance bot;
@@ -74,6 +73,8 @@ namespace VPTerrain
         {
             Log.Info(tag, "Commencing write...");
 
+            bot.Terrain.CallbackNodeSet += onNodeSet;
+
             for (var tileX = originTileX; tileX <= lastTileX; tileX++)
             for (var tileZ = originTileZ; tileZ <= lastTileZ; tileZ++)
             {
@@ -94,18 +95,20 @@ namespace VPTerrain
                     for (var cellX = 0; cellX < 8; cellX++)
                     for (var cellZ = 0; cellZ < 8; cellZ++)
                     {
-                        var pixelX = cellX + nodeOffsetX + tileOffsetX;
-                        var pixelZ = cellZ + nodeOffsetZ + tileOffsetZ;
-                        var pixel  = heightmap.GetPixel(pixelX, pixelZ);
-                        var height = (float) pixel.R;
-                        var ratio  = Math.Max( (int) pixel.B, 1 );
-                        var cell   = new TerrainCell
+                        var pixelX  = cellX + nodeOffsetX + tileOffsetX;
+                        var pixelZ  = cellZ + nodeOffsetZ + tileOffsetZ;
+                        var pixel   = heightmap.GetPixel(pixelX, pixelZ);
+                        var height  = (float) pixel.R;
+                        var ratio   = Math.Max( (int) pixel.B, 1 );
+                        var hole    = pixel.G == 0xFF;
+                        var texture = hole ? 0 : pixel.G; 
+                        var cell    = new TerrainCell
                         {
-                            Height = (height - Consts.HeightmapGroundLevel) / ratio,
-                            Hole   = pixel.G == 0xFF
+                            Height  = (height - Consts.HeightmapGroundLevel) / ratio,
+                            Hole    = hole,
+                            Texture = (ushort) texture
                         };
 
-                        // TODO: Investigate why swapping z and x is nessecary...
                         node[cellX, cellZ] = cell;
                     }
 
@@ -115,29 +118,27 @@ namespace VPTerrain
             }
 
             Log.Info(tag, "Writing to network...");
-            Console.Title           = "Writing to network; press CTRL + C when no more 'Unknown transaction' messages appear";
-            Console.CancelKeyPress += onCTRLC;
-            
             sending = true;
 
             while (sending)
-                bot.Wait(0);
-
-            Console.CancelKeyPress -= onCTRLC;
+                bot.Pump();
         }
 
-        void onCTRLC(object sender, ConsoleCancelEventArgs e)
+        void onNodeSet(Instance sender, ReasonCode result, TerrainNode node, int tileX, int tileZ)
         {
-            e.Cancel = true;
-            sending  = false;   
+            Console.Title = "Sent node {0}x{1} for tile {2}x{3}".LFormat(node.X, node.Z, tileX, tileZ);
+
+            sent++;
+            if (sent >= totalNodes)
+                sending = false;
         }
 
         public void Dispose()
         {
+            bot.Terrain.CallbackNodeSet -= onNodeSet;
+
             if (heightmap != null)
                 heightmap.Dispose();
-
-            Console.CancelKeyPress -= onCTRLC;
         }
 
         bool resolveData(string path)

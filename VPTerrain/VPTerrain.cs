@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Threading;
-using System.Linq;
 using VP;
 
 namespace VPTerrain
@@ -11,6 +11,9 @@ namespace VPTerrain
         static VPTerrain instance;
 
         Instance bot;
+        Task     keepAliveTask;
+        bool     keepAlive = true;
+        bool     finishing = false;
 
         public static void Main(string[] args)
         {
@@ -27,10 +30,12 @@ namespace VPTerrain
         public void Run()
         {
             ConnectBot();
+            keepAliveTask = Task.Factory.StartNew(KeepAlive);
             
             while (true)
             {
                 var task = ConsoleEx.AskEnum<Operations>("What would you like to do?");
+                keepAlive = false;
 
                 // TODO: change this to reflection based system
                 switch (task)
@@ -38,6 +43,10 @@ namespace VPTerrain
                     case Operations.Exit:
                         Finish();
                         return;
+
+                    case Operations.PalmGen:
+                        DoOperation( new PalmGen() );
+                        break;
 
                     case Operations.SaveHeightmap:
                         DoOperation( new SaveHeightmap() );
@@ -51,11 +60,16 @@ namespace VPTerrain
                         DoOperation( new TreeGen() );
                         break;
 
-                    case Operations.TreeGenUndo:
-                        DoOperation( new TreeGenUndo() );
+                    case Operations.OceanGen:
+                        DoOperation( new OceanGen() );
+                        break;
+
+                    case Operations.GenUndo:
+                        DoOperation( new GenUndo() );
                         break;
                 }
 
+                keepAlive = true;
                 Console.Title = "Operation complete - VPTerrain";
             }
         }
@@ -92,11 +106,11 @@ namespace VPTerrain
             {
                 Log.Info("Bot", "Creating and logging in new bot instance");
 
-                bot = new Instance("VPTerrain");
-                bot.Login(username, password);
-                bot.Enter(world);
-                bot.GoTo();
-                bot.Wait(0);
+                bot = new Instance()
+                    .Login(username, password, "VPTerrain")
+                    .Enter(world)
+                    .GoTo()
+                    .Pump();
             }
             catch (Exception e)
             {
@@ -106,8 +120,21 @@ namespace VPTerrain
             }
         }
 
+        public void KeepAlive()
+        {
+            while (!finishing)
+                if (keepAlive && bot != null)
+                    bot.Pump(1000);
+                else
+                    Thread.Sleep(1000);
+        }
+
         public void Finish()
         {
+            Log.Debug(tag, "Waiting for keep-alive thread to finish");
+            finishing = true;
+            keepAliveTask.Wait();
+
             Log.Info(tag, "Finished");
             bot.Dispose();
         }

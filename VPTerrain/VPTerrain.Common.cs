@@ -7,10 +7,12 @@ namespace VPTerrain
 {
     public enum Operations
     {
+        PalmGen,
         SaveHeightmap,
         LoadHeightmap,
         TreeGen,
-        TreeGenUndo,
+        OceanGen,
+        GenUndo,
         Exit
     }
 

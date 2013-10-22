@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using VP;
 
 namespace VPTerrain
 {
-    public class TreeGenUndo : IOperation
+    public class GenUndo : IOperation
     {
-        const string tag = "TreeGenUndo";
+        const string tag = "GenUndo";
 
         int      toDelete;
         int      deleted;
@@ -20,7 +19,7 @@ namespace VPTerrain
         {
             while (true)
             {
-                path = ConsoleEx.Ask("What treegenlog do you wish to undo?").Trim('"');
+                path = ConsoleEx.Ask("What generator log do you wish to undo?").Trim('"');
 
                 if ( !File.Exists(path) )
                     Log.Warn(tag, "No such file: {0}", path);
@@ -53,24 +52,24 @@ namespace VPTerrain
                     ids.Add(id);
             }
 
-            Log.Info(tag, "Commencing undo of {0} trees...", ids.Count);
+            Log.Info(tag, "Commencing undo of {0} objects...", ids.Count);
             toDelete = ids.Count;
 
             foreach (var id in ids)
                 bot.Property.DeleteObject(id);
 
             while (deleting)
-                bot.Wait(0);
+                bot.Pump();
         }
 
-        void onDelete(Instance sender, ObjectCallbackData args)
+        void onDelete(Instance sender, ReasonCode result, int id)
         {
-            Console.Title = "Deleted tree ID {0}; {1} out of {2}".LFormat(args.Object.Id, deleted, toDelete);
+            Console.Title = "Deleted object ID {0}; {1} out of {2}".LFormat(id, deleted, toDelete);
             deleted++;
 
             if (deleted >= toDelete)
             {
-                Log.Info(tag, "All {0} trees undone", toDelete);
+                Log.Info(tag, "All {0} objects undone", toDelete);
                 deleting = false;
             }
         }

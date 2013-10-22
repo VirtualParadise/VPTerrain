@@ -6,32 +6,17 @@ using VP;
 
 namespace VPTerrain
 {
-    public class TreeGen : IOperation
+    public class PalmGen : IOperation
     {
-        const string tag      = "TreeGen";
-        const string template = "create solid no, scale {0} {1} {0}, color tint {2}";
-        //const string template = "create solid no, scale {0} .2 {0}, specular 0";
+        const string tag      = "PalmGen";
+        const string template = "create scale {0} {1} {0}, rotate -.1 0 0 loop time={2} wait=.3,specular 0";
 
         Random rand = new Random();
 
-        static string[] colorsMid = new[]
-        {
-            "aaffaa", "bbffbb", "aaffcc", "ffffaa",
-            "aaffee", "bbeebb", "bbffcc", "aaddaa",
-            "aaffdd", "bbddbb", "ccffcc", "eeffaa",
-        };
-
-        static string[] colorsLarge = new[]
-        {
-            "88dd88", "55ee99", "99dd88", "88dd77",
-        };
-
         static string[] models = new[]
         {
-            "tbtree003", "tbtree004", "tbtree005",
+            "palmtree5", "palmtree2", "palmtree4"
         };
-
-        string model = "pinetree1b";
 
         int  originTileX;
         int  originTileZ;
@@ -180,6 +165,10 @@ namespace VPTerrain
             //var n = rand.Next(1, 2);
             var n = 1;
 
+            // Randomly skip cell
+            if ( rand.Next(0, 100) >= 80 )
+                return;
+
             for (var i = 0; i < n; i++)
             {
                 var treeHeight = (float) ( height - .1 - (rand.NextDouble() / 6) );
@@ -187,22 +176,16 @@ namespace VPTerrain
                 var treeZ      = (float) ( z + rand.NextDouble() );
                 var treePos    = new Vector3D(treeX, treeHeight, treeZ);
                 var treeRot    = Quaternion.CreateFromYawPitchRoll((float) (rand.NextDouble() * Math.PI), 0f, 0f);
-                var scale      = Math.Round( 1.5 + ( rand.NextDouble() * 2 ), 4);
-                var color      = scale > 3.5
-                    ? colorsLarge[ rand.Next(0, colorsLarge.Length - 1) ]
-                    : scale < 2
-                        ? "ffffff"
-                        : colorsMid[ rand.Next(0, colorsMid.Length - 1) ];
+                var scale      = Math.Round( 0.8 + ( rand.NextDouble() / 2 ), 2);
+                var time       = Math.Round( rand.NextDouble() * 5, 2);
 
-                var tree = new VPObject(model, treePos, treeRot)
+                var tree = new VPObject(models[ rand.Next(0, models.Length - 1) ], treePos, treeRot)
                 {
-                    //Model    = models[ rand.Next(0, models.Length - 1) ],
-                    Action   = template.LFormat(scale * 1.5, scale * 1.5, color),
-                    //Action   = template.LFormat(scale),
+                    Action = template.LFormat(scale * 1.5, scale * 1.5, time),
                 };
 
-                if (scale < 2)
-                    tree.Action += ", visible no radius=150";
+                if ( rand.Next(0, 100) >= 50 )
+                    tree.Action += ", visible no radius=200";
 
                 trees.Add(tree);
             }
