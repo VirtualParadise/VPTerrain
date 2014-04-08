@@ -72,6 +72,7 @@ namespace VPTerrain
         public void CommenceWrite()
         {
             Log.Info(tag, "Commencing write...");
+            VPTerrain.Busy = true;
 
             bot.Terrain.CallbackNodeSet += onNodeSet;
 
@@ -122,6 +123,8 @@ namespace VPTerrain
 
             while (sending)
                 bot.Pump();
+
+            VPTerrain.Busy = false;
         }
 
         void onNodeSet(Instance sender, ReasonCode result, TerrainNode node, int tileX, int tileZ)

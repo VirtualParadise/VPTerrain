@@ -62,6 +62,8 @@ namespace VPTerrain
             scanning  = true;
             scanned   = 0;
 
+            VPTerrain.Busy = true;
+
             bot.Terrain.GetNode += onNodeGet;
 
             for (var tileX = originTileX; tileX < originTileX + widthX; tileX++)
@@ -78,6 +80,8 @@ namespace VPTerrain
 
             while (scanning)
                 bot.Pump();
+
+            VPTerrain.Busy = false;
         }
 
         public void SaveResult()

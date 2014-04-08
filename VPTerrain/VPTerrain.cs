@@ -7,13 +7,14 @@ namespace VPTerrain
 {
     class VPTerrain
     {
-        const  string    tag = "VPTerrain";
-        static VPTerrain instance;
+        const  string tag = "VPTerrain";
 
-        Instance bot;
-        Task     keepAliveTask;
-        bool     keepAlive = true;
-        bool     finishing = false;
+        public static bool Busy = false;
+
+        static Instance bot;
+
+        static Task botLoop;
+        static bool finishing = false;
 
         public static void Main(string[] args)
         {
@@ -21,28 +22,19 @@ namespace VPTerrain
             Log.Info(tag, "Starting up...");
             Console.Title = "VP terrain tool";
 
-            instance = new VPTerrain();
-            instance.Run();
-
-            Log.Info(tag, "Shutting down...");
-        }
-
-        public void Run()
-        {
             ConnectBot();
-            keepAliveTask = Task.Factory.StartNew(KeepAlive);
+            botLoop = Task.Factory.StartNew(BotLoop);
             
-            while (true)
+            while (!finishing)
             {
                 var task = ConsoleEx.AskEnum<Operations>("What would you like to do?");
-                keepAlive = false;
 
                 // TODO: change this to reflection based system
                 switch (task)
                 {
                     case Operations.Exit:
                         Finish();
-                        return;
+                        break;
 
                     case Operations.PalmGen:
                         DoOperation( new PalmGen() );
@@ -69,12 +61,13 @@ namespace VPTerrain
                         break;
                 }
 
-                keepAlive = true;
                 Console.Title = "Operation complete - VPTerrain";
             }
+
+            Log.Info(tag, "Shutting down...");
         }
 
-        public void DoOperation(IOperation current)
+        public static void DoOperation(IOperation current)
         {
             try
             {
@@ -93,7 +86,7 @@ namespace VPTerrain
             }
         }
 
-        public void ConnectBot()
+        public static void ConnectBot()
         {
             if (bot != null)
                 bot.Dispose();
@@ -120,20 +113,18 @@ namespace VPTerrain
             }
         }
 
-        public void KeepAlive()
+        public static void BotLoop()
         {
             while (!finishing)
-                if (keepAlive && bot != null)
-                    bot.Pump(1000);
-                else
-                    Thread.Sleep(1000);
+                if (!Busy)
+                    bot.Pump();
         }
 
-        public void Finish()
+        public static void Finish()
         {
             Log.Debug(tag, "Waiting for keep-alive thread to finish");
             finishing = true;
-            keepAliveTask.Wait();
+            botLoop.Wait();
 
             Log.Info(tag, "Finished");
             bot.Dispose();

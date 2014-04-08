@@ -38,7 +38,9 @@ namespace VPTerrain
             var ids   = new List<int>(lines.Length);
             deleted   = 0;
             deleting  = true;
-            
+
+            VPTerrain.Busy = true;
+
             foreach (var line in lines)
             {
                 int id;
@@ -60,6 +62,8 @@ namespace VPTerrain
 
             while (deleting)
                 bot.Pump();
+
+            VPTerrain.Busy = false;
         }
 
         void onDelete(Instance sender, ReasonCode result, int id)

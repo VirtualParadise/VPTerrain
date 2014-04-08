@@ -81,6 +81,8 @@ namespace VPTerrain
             scannedNodes = 0;
             trees        = new List<VPObject>();
 
+            VPTerrain.Busy = true;
+
             bot.Terrain.GetNode               += onNodeGet;
             bot.Property.CallbackObjectCreate += onCreate;
 
@@ -98,6 +100,8 @@ namespace VPTerrain
 
             while (scanning)
                 bot.Pump();
+
+            VPTerrain.Busy = false;
         }
 
         public void CommencePlanting()

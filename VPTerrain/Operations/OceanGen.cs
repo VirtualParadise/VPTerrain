@@ -57,6 +57,8 @@ namespace VPTerrain
             builtOcean = 0;
             totalOcean = 0;
 
+            VPTerrain.Busy = true;
+
             bot.Property.CallbackObjectCreate += onCreate;
 
             for (var oceanX = originX; oceanX <= originX + widthX; oceanX += 6)
@@ -73,6 +75,8 @@ namespace VPTerrain
 
             while (building)
                 bot.Pump();
+
+            VPTerrain.Busy = false;
         }
 
         void onCreate(Instance sender, ReasonCode result, VPObject obj)

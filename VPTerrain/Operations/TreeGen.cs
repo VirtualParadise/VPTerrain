@@ -111,8 +111,12 @@ namespace VPTerrain
                 bot.Terrain.QueryTile(tileX, tileZ, revisions);
             }
 
+            VPTerrain.Busy = true;
+
             while (scanning)
                 bot.Pump();
+
+            VPTerrain.Busy = false;
         }
 
         public void CommencePlanting()
@@ -122,11 +126,15 @@ namespace VPTerrain
             building   = true;
             builtTrees = 0;
 
+            VPTerrain.Busy = true;
+
             foreach (var tree in trees)
                 bot.Property.AddObject(tree);
 
             while (building)
                 bot.Pump();
+
+            VPTerrain.Busy = false;
         }
 
         /// <summary>
