@@ -2,3 +2,7 @@ Build/*
 *.suo
 */obj/*
 packages/
+
+bin/
+x86/
+x64/

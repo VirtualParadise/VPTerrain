@@ -1,5 +1,4 @@
-﻿using Nexus;
-using System;
+﻿using System;
 using System.IO;
 using VP;
 
@@ -64,7 +63,7 @@ namespace VPTerrain
             for (var oceanX = originX; oceanX <= originX + widthX; oceanX += 6)
             for (var oceanZ = originZ; oceanZ <= originZ + widthZ; oceanZ += 6)
             {
-                var ocean = new VPObject( "f6000,0,.1,.1.rwx", new Vector3D(oceanX, -0.05f, oceanZ) )
+                var ocean = new VPObject( "f6000,0,.1,.1.rwx", new Vector3(oceanX, -0.05f, oceanZ) )
                 {
                     Action   = action
                 };

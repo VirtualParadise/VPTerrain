@@ -1,5 +1,4 @@
-﻿using Nexus;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using VP;
@@ -193,8 +192,8 @@ namespace VPTerrain
                 var treeHeight = (float) ( height - .1 - (rand.NextDouble() / 6) );
                 var treeX      = (float) ( x + rand.NextDouble() );
                 var treeZ      = (float) ( z + rand.NextDouble() );
-                var treePos    = new Vector3D(treeX, treeHeight, treeZ);
-                var treeRot    = Quaternion.CreateFromYawPitchRoll((float) (rand.NextDouble() * Math.PI), 0f, 0f);
+                var treePos    = new Vector3(treeX, treeHeight, treeZ);
+                var treeRot    = new Rotation(0, (float) (rand.NextDouble() * Math.PI), 0, 0);
                 var scale      = Math.Round( 1.5 + ( rand.NextDouble() * 2 ), 4);
                 var color      = scale > 3.5
                     ? colorsLarge[ rand.Next(0, colorsLarge.Length - 1) ]
