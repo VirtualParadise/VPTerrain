@@ -68,15 +68,7 @@ namespace VPTerrain
 
             for (var tileX = originTileX; tileX < originTileX + widthX; tileX++)
             for (var tileZ = originTileZ; tileZ < originTileZ + widthZ; tileZ++)
-            {
-                var revisions = new int[4,4];
-
-                for (var x = 0; x < 4; x++)
-                for (var z = 0; z < 4; z++)
-                    revisions[x,z] = -1;
-
-                bot.Terrain.QueryTile(tileX, tileZ, revisions);
-            }
+                bot.Terrain.QueryTile(tileX, tileZ);
 
             while (scanning)
                 bot.Pump();
